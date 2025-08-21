@@ -5,7 +5,7 @@
 ## 在线访问
 
 GitHub Pages 在线文档站链接：  
-[https://w0302533-byte.github.io/api-docs/](https://w0302533-byte.github.io/api-docs/)
+访问文档站：[在线文档](https://w0302533-byte.github.io/api-docs/)
 
 ## 文件说明
 
