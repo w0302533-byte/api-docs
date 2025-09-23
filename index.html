@@ -185,8 +185,7 @@
             position: sticky;
             top: 0;
             z-index: 50;
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
             box-sizing: border-box;
         }
 
@@ -717,6 +716,75 @@
                 padding: 16px 20px;
                 padding-left: 60px;
             }
+        }
+
+        /* 标签页样式 */
+        .code-example-container {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .code-tabs {
+            display: flex;
+            background: var(--bg-tertiary);
+            border-radius: 8px 8px 0 0;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            overflow: hidden;
+        }
+
+        .code-tab {
+            background: transparent;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-tab:last-child {
+            border-right: none;
+        }
+
+        .code-tab:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .code-tab.active {
+            background: var(--bg-primary);
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            position: relative;
+        }
+
+        .code-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--bg-primary);
+        }
+
+        .code-content {
+            display: none;
+        }
+
+        .code-content.active {
+            display: block;
+        }
+
+        .code-content .code-block {
+            border-radius: 0 0 8px 8px;
+            margin: 0;
         }
 
         /* 强制修复所有内容的缩进问题 */
@@ -2321,10 +2389,23 @@ Content-Type: application/json
             <div class="section">
                 <h2><i class="fas fa-code"></i> 示例代码</h2>
 
-                <h3><i class="fab fa-php"></i> PHP 示例</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
-                    <code>&lt;?php
+                <div class="code-example-container">
+                    <div class="code-tabs">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'examples-php')">
+                            <i class="fab fa-php"></i> PHP
+                        </button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'examples-java')">
+                            <i class="fab fa-java"></i> Java
+                        </button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'examples-js')">
+                            <i class="fab fa-js"></i> JavaScript
+                        </button>
+                    </div>
+
+                    <div id="examples-php" class="code-content active">
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
+                            <code>&lt;?php
 class PaymentAPI {
     private $merchantId;
     private $secretKey;
@@ -2433,13 +2514,188 @@ $transferResult = $api->createTransferOrder(
     ]
 );
 ?&gt;
-                    </code>
-                </div>
+                            </code>
+                        </div>
+                    </div>
 
-                <h3><i class="fab fa-js"></i> JavaScript 示例</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
-                    <code>
+                    <div id="examples-java" class="code-content">
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
+                            <code>import java.util.*;
+import java.security.MessageDigest;
+import java.net.http.*;
+import java.net.URI;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class PaymentAPI {
+    private String merchantId;
+    private String secretKey;
+    private String apiUrl;
+    private HttpClient httpClient;
+    private ObjectMapper objectMapper;
+
+    public PaymentAPI(String merchantId, String secretKey, String apiUrl) {
+        this.merchantId = merchantId;
+        this.secretKey = secretKey;
+        this.apiUrl = apiUrl;
+        this.httpClient = HttpClient.newHttpClient();
+        this.objectMapper = new ObjectMapper();
+    }
+
+    // 生成签名
+    private String generateSign(Map<String, Object> params) throws Exception {
+        Map<String, Object> signParams = new HashMap<>(params);
+        signParams.remove("sign");
+        signParams.remove("sign_type");
+
+        List<String> keys = new ArrayList<>(signParams.keySet());
+        Collections.sort(keys);
+
+        StringBuilder signStr = new StringBuilder();
+        for (String key : keys) {
+            Object value = signParams.get(key);
+            if (value != null && !value.toString().isEmpty()) {
+                if (value instanceof Map || value instanceof List) {
+                    value = objectMapper.writeValueAsString(value);
+                }
+                signStr.append(key).append("=").append(value).append("&");
+            }
+        }
+        signStr.append("key=").append(secretKey);
+
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] digest = md.digest(signStr.toString().getBytes("UTF-8"));
+
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : digest) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+
+        return hexString.toString().toUpperCase();
+    }
+
+    // 代收下单
+    public Map<String, Object> createPayOrder(double amount, String channelCode,
+            String merchantOrderNo, String notifyUrl, String subject) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("merchant_id", merchantId);
+        params.put("amount", String.format("%.2f", amount));
+        params.put("currency", "BRL");
+        params.put("channel_code", channelCode);
+        params.put("merchant_order_no", merchantOrderNo);
+        params.put("notify_url", notifyUrl);
+        params.put("subject", subject);
+        params.put("timestamp", System.currentTimeMillis() / 1000);
+        params.put("sign_type", "md5");
+
+        String sign = generateSign(params);
+        params.put("sign", sign);
+
+        return httpPost("/pay/unifiedOrder", params);
+    }
+
+    // 代付下单
+    public Map<String, Object> createTransferOrder(double amount, String channelCode,
+            String merchantOrderNo, String notifyUrl, String subject,
+            Map<String, String> extraParams) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("merchant_id", merchantId);
+        params.put("amount", String.format("%.2f", amount));
+        params.put("currency", "BRL");
+        params.put("channel_code", channelCode);
+        params.put("merchant_order_no", merchantOrderNo);
+        params.put("notify_url", notifyUrl);
+        params.put("subject", subject);
+        params.put("extra_params", extraParams);
+        params.put("timestamp", System.currentTimeMillis() / 1000);
+        params.put("sign_type", "md5");
+
+        String sign = generateSign(params);
+        params.put("sign", sign);
+
+        return httpPost("/repay/unifiedOrder", params);
+    }
+
+    // 查询订单
+    public Map<String, Object> queryOrder(String merchantOrderNo) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("merchant_id", merchantId);
+        params.put("merchant_order_no", merchantOrderNo);
+        params.put("timestamp", System.currentTimeMillis() / 1000);
+        params.put("sign_type", "md5");
+
+        String sign = generateSign(params);
+        params.put("sign", sign);
+
+        return httpPost("/pay/query", params);
+    }
+
+    // HTTP请求
+    private Map<String, Object> httpPost(String uri, Map<String, Object> data) throws Exception {
+        String url = apiUrl + uri;
+        String jsonBody = objectMapper.writeValueAsString(data);
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+            .timeout(java.time.Duration.ofSeconds(30))
+            .build();
+
+        HttpResponse<String> response = httpClient.send(request,
+            HttpResponse.BodyHandlers.ofString());
+
+        return objectMapper.readValue(response.body(), Map.class);
+    }
+
+    // 使用示例
+    public static void main(String[] args) {
+        try {
+            PaymentAPI api = new PaymentAPI("10001", "your_secret_key",
+                "https://api.yourpay.com");
+
+            // 创建代收订单
+            Map<String, Object> payResult = api.createPayOrder(
+                100.00,                           // 金额
+                "pix_001",                        // 通道编码
+                "ORDER" + System.currentTimeMillis(), // 商户订单号
+                "https://your-site.com/notify",   // 通知地址
+                "商品购买"                         // 商品描述
+            );
+            System.out.println("代收订单创建结果: " + payResult);
+
+            // 创建代付订单
+            Map<String, String> extraParams = new HashMap<>();
+            extraParams.put("name", "João Silva");
+            extraParams.put("CPF", "12345678901");
+
+            Map<String, Object> transferResult = api.createTransferOrder(
+                50.00,                            // 金额
+                "pix_transfer",                   // 通道编码
+                "TRANSFER" + System.currentTimeMillis(), // 商户订单号
+                "https://your-site.com/transfer-notify", // 通知地址
+                "佣金发放",                        // 说明
+                extraParams                       // 收款人信息
+            );
+            System.out.println("代付订单创建结果: " + transferResult);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+                            </code>
+                        </div>
+                    </div>
+
+                    <div id="examples-js" class="code-content">
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
+                            <code>
 const crypto = require('crypto');
 const axios = require('axios');
 
@@ -2534,7 +2790,9 @@ api.createPayOrder(
 }).catch(error => {
     console.error('订单创建失败:', error);
 });
-                    </code>
+                            </code>
+                        </div>
+                    </div>
                 </div>
             </div>
                 </div>
@@ -2687,6 +2945,30 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
         function toggleMobileMenu() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('open');
+        }
+
+        // 标签页切换函数
+        function switchCodeTab(button, targetId) {
+            // 获取当前标签页容器
+            const container = button.closest('.code-example-container');
+            if (!container) return;
+
+            // 移除所有标签页的active状态
+            const tabs = container.querySelectorAll('.code-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // 隐藏所有内容
+            const contents = container.querySelectorAll('.code-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // 激活当前标签页
+            button.classList.add('active');
+
+            // 显示对应内容
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
         }
 
         // 生成目录
