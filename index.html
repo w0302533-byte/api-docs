@@ -858,9 +858,130 @@
                 box-shadow: none;
             }
         }
+        /* 密码保护登录界面样式 */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .auth-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .auth-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .auth-container h2 {
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .auth-container p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .auth-button:hover {
+            background: var(--primary-hover);
+        }
+
+        .auth-error {
+            color: var(--accent-color);
+            font-size: 0.875rem;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .auth-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 1.5rem;
+        }
     </style>
 </head>
 <body>
+    <!-- 密码保护登录界面 -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-container">
+            <div class="auth-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2>访问验证</h2>
+            <p>请输入访问密码以查看 API 文档</p>
+            <input type="password" class="auth-input" id="passwordInput" placeholder="请输入访问密码" />
+            <button class="auth-button" onclick="checkPassword()">验证访问</button>
+            <div class="auth-error" id="authError">密码错误，请重试</div>
+        </div>
+    </div>
     <div class="app-layout">
         <!-- 移动端菜单按钮 -->
         <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
@@ -3467,6 +3588,80 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
                 });
             });
         });
+
+        // 密码保护功能
+        const ACCESS_PASSWORD_HASH = 'af8951504334f184607adc94c31edb88f1c0430effe5e0ff036f5e3239f31418';
+        const SESSION_KEY = 'api_doc_authenticated';
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        // 页面加载时检查认证状态
+        window.addEventListener('load', function() {
+            // 检查会话存储中是否已认证
+            if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+                hideAuthOverlay();
+            } else {
+                showAuthOverlay();
+            }
+
+            // 为密码输入框添加回车键监听
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+        });
+
+        function showAuthOverlay() {
+            document.getElementById('authOverlay').classList.remove('hidden');
+            document.getElementById('passwordInput').focus();
+        }
+
+        function hideAuthOverlay() {
+            document.getElementById('authOverlay').classList.add('hidden');
+        }
+
+        async function checkPassword() {
+            const inputPassword = document.getElementById('passwordInput').value;
+            const errorElement = document.getElementById('authError');
+
+            try {
+                const inputHash = await sha256(inputPassword);
+
+                if (inputHash === ACCESS_PASSWORD_HASH) {
+                    sessionStorage.setItem(SESSION_KEY, 'true');
+                    hideAuthOverlay();
+                    errorElement.style.display = 'none';
+                } else {
+                    showPasswordError(errorElement);
+                }
+            } catch (error) {
+                console.error('密码验证出错:', error);
+                showPasswordError(errorElement);
+            }
+        }
+
+        function showPasswordError(errorElement) {
+            errorElement.style.display = 'block';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordInput').focus();
+
+            // 3秒后隐藏错误信息
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // 可选：添加退出登录功能（清除认证状态）
+        function logout() {
+            sessionStorage.removeItem(SESSION_KEY);
+            showAuthOverlay();
+        }
     </script>
 </body>
 </html>
