@@ -865,7 +865,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f3f9ff 0%, #e1f5fe 25%, #b3e5fc 50%, #e0f2f1 75%, #e8f5e8 100%);
             z-index: 9999;
             display: flex;
             align-items: center;
@@ -3589,9 +3589,9 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
             });
         });
 
-        // 密码保护功能
         const ACCESS_PASSWORD_HASH = 'a01735ecf31013e03174f7e8c7e530fdd3895576a3fab22822f1496d1948ca13';
         const SESSION_KEY = 'api_doc_authenticated';
+
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -3662,6 +3662,7 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
             sessionStorage.removeItem(SESSION_KEY);
             showAuthOverlay();
         }
+
     </script>
 </body>
 </html>
