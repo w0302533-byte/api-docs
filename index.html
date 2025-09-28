@@ -966,6 +966,8 @@
             color: white;
             font-size: 1.5rem;
         }
+
+
     </style>
 </head>
 <body>
@@ -1005,6 +1007,9 @@
                 </button>
                 <button class="nav-item" onclick="showSection('auth')">
                     <i class="fas fa-shield-alt"></i> 接口认证
+                </button>
+                <button class="nav-item" onclick="showSection('currency')">
+                    <i class="fas fa-coins"></i> 货币代码
                 </button>
                 <button class="nav-item" onclick="showSection('collection')">
                     <i class="fas fa-download"></i> 代收接口
@@ -1356,6 +1361,43 @@ Content-Type: application/json
     "time": 1755704254
 }</code>
                 </div>
+                <h3><i class="fas fa-info-circle"></i> 收订单状态说明</h3>
+                <table class="param-table">
+                    <thead>
+                    <tr>
+                        <th>状态值</th>
+                        <th>状态名称</th>
+                        <th>说明</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><code>0</code></td>
+                        <td>待支付</td>
+                        <td>订单已创建，等待用户支付</td>
+                    </tr>
+                    <tr>
+                        <td><code>1</code></td>
+                        <td>支付中</td>
+                        <td>用户已发起支付，系统处理中</td>
+                    </tr>
+                    <tr>
+                        <td><code>2</code></td>
+                        <td>成功</td>
+                        <td>支付成功，资金已到账</td>
+                    </tr>
+                    <tr>
+                        <td><code>-1</code></td>
+                        <td>失败</td>
+                        <td>代付失败</td>
+                    </tr>
+                    <tr>
+                        <td><code>-2</code></td>
+                        <td>已取消</td>
+                        <td>订单已取消</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
                 </div>
 
@@ -1536,13 +1578,29 @@ Content-Type: application/json
     "extra_params": {
         "name": "João Silva",
         "CPF": "12345678901",
-        "PHONE": "+5511999999999",
-        "EMAIL": "joao@example.com"
+        "phone": "+5511999999999",
+        "email": "joao@example.com"
     },
     "timestamp": 1640995200,
     "sign_type": "md5",
-    "sign": "B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7"
+    "sign": "C024305218DD3D52C247C630515DC3BB"
 }</code>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong><i class="fas fa-calculator"></i> 签名计算过程：</strong>
+                    <div class="code-block" style="margin: 10px 0;">
+                        <code>
+// 1. 处理数组参数
+extra_params = "CPF=12345678901&email=joao@example.com&name=João Silva&phone=+5511999999999"
+
+// 2. 构建签名字符串（按字母序排序）
+signString = "amount=100.00&channel_code=pix_transfer&currency=BRL&extra_params=CPF=12345678901&email=joao@example.com&name=João Silva&phone=+5511999999999&merchant_id=10001&merchant_order_no=TRANSFER20240101001&notify_url=https://your-site.com/transfer-notify&sign_type=md5&subject=佣金发放&timestamp=1640995200&key=YOUR_SECRET_KEY"
+
+// 3. MD5加密并转大写
+sign = MD5(signString).toUpperCase()
+                        </code>
+                    </div>
                 </div>
 
                 <h3><i class="fas fa-check-circle"></i> 响应参数</h3>
@@ -1559,8 +1617,8 @@ Content-Type: application/json
                         <tr>
                             <td>code</td>
                             <td>Integer</td>
-                            <td>状态码，0表示成功</td>
-                            <td>0</td>
+                            <td>状态码，1表示成功</td>
+                            <td>1</td>
                         </tr>
                         <tr>
                             <td>msg</td>
@@ -1578,13 +1636,49 @@ Content-Type: application/json
                             <td>data.order_no</td>
                             <td>String</td>
                             <td>系统订单号</td>
-                            <td>SYS20240101002</td>
+                            <td>W202509290406012179bfc99</td>
+                        </tr>
+                        <tr>
+                            <td>data.merchant_order_no</td>
+                            <td>String</td>
+                            <td>商户订单号</td>
+                            <td>TEST1759089961685</td>
                         </tr>
                         <tr>
                             <td>data.status</td>
-                            <td>String</td>
+                            <td>Integer</td>
                             <td>订单状态</td>
-                            <td>1</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>data.status_text</td>
+                            <td>String</td>
+                            <td>状态描述</td>
+                            <td>代付请求已提交，正在处理中</td>
+                        </tr>
+                        <tr>
+                            <td>data.amount</td>
+                            <td>Decimal</td>
+                            <td>代付金额</td>
+                            <td>100</td>
+                        </tr>
+                        <tr>
+                            <td>data.fee</td>
+                            <td>Decimal</td>
+                            <td>手续费</td>
+                            <td>0.2</td>
+                        </tr>
+                        <tr>
+                            <td>data.create_time</td>
+                            <td>Integer</td>
+                            <td>创建时间戳</td>
+                            <td>1759089961</td>
+                        </tr>
+                        <tr>
+                            <td>data.channel_data</td>
+                            <td>Array</td>
+                            <td>通道数据</td>
+                            <td>[]</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1593,13 +1687,67 @@ Content-Type: application/json
                 <div class="code-block">
                     <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                     <code>{
-    "code": 0,
+    "code": 1,
     "msg": "success",
     "data": {
-        "order_no": "SYS20240101002",
-        "status": "1"
+        "order_no": "W202509290406012179bfc99",
+        "merchant_order_no": "TEST1759089961685",
+        "status": 0,
+        "status_text": "代付请求已提交，正在处理中",
+        "amount": 100,
+        "fee": 0.2,
+        "create_time": 1759089961,
+        "channel_data": []
     }
 }</code>
+                </div>
+
+                <h3><i class="fas fa-info-circle"></i> 代付订单状态说明</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>状态值</th>
+                            <th>状态名称</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>0</code></td>
+                            <td>待处理</td>
+                            <td>订单已创建，等待用户支付</td>
+                        </tr>
+                        <tr>
+                            <td><code>1</code></td>
+                            <td>处理中</td>
+                            <td>用户已发起代付，系统处理中</td>
+                        </tr>
+                        <tr>
+                            <td><code>3</code></td>
+                            <td>成功</td>
+                            <td>代付已成功完成</td>
+                        </tr>
+                        <tr>
+                            <td><code>-1</code></td>
+                            <td>失败</td>
+                            <td>代付失败</td>
+                        </tr>
+                        <tr>
+                            <td><code>-2</code></td>
+                            <td>已取消</td>
+                            <td>代付订单已取消</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info">
+                    <strong><i class="fas fa-lightbulb"></i> 重要说明：</strong>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>code字段</strong>：1表示接口调用成功，0或其他值表示失败</li>
+                        <li><strong>status字段</strong>：表示代付订单的实际处理状态</li>
+                        <li><strong>fee字段</strong>：手续费金额，从代付金额中扣除</li>
+                        <li><strong>channel_data字段</strong>：通道返回的额外数据，通常为空数组</li>
+                    </ul>
                 </div>
             </div>
                 </div>
@@ -1677,8 +1825,8 @@ Content-Type: application/json
                         <tr>
                             <td>code</td>
                             <td>Integer</td>
-                            <td>状态码，0表示成功</td>
-                            <td>0</td>
+                            <td>状态码，1表示成功</td>
+                            <td>1</td>
                         </tr>
                         <tr>
                             <td>msg</td>
@@ -1788,7 +1936,7 @@ Content-Type: application/json
                 <div class="code-block">
                     <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                     <code>{
-    "code": 0,
+    "code": 1,
     "msg": "success",
     "data": {
         "order_no": "SYS20240101001",
@@ -1870,8 +2018,8 @@ Content-Type: application/json
                         <tr>
                             <td>code</td>
                             <td>Integer</td>
-                            <td>状态码，0表示成功</td>
-                            <td>0</td>
+                            <td>状态码，1表示成功</td>
+                            <td>1</td>
                         </tr>
                         <tr>
                             <td>msg</td>
@@ -1883,25 +2031,25 @@ Content-Type: application/json
                             <td>data.order_no</td>
                             <td>String</td>
                             <td>系统订单号</td>
-                            <td>SYS20240101002</td>
+                            <td>SYS20240101001</td>
                         </tr>
                         <tr>
                             <td>data.merchant_order_no</td>
                             <td>String</td>
                             <td>商户订单号</td>
-                            <td>TRANSFER20240101001</td>
+                            <td>ORDER20240101001</td>
                         </tr>
                         <tr>
                             <td>data.amount</td>
-                            <td>String</td>
-                            <td>代付金额</td>
+                            <td>Decimal</td>
+                            <td>订单金额</td>
                             <td>100.00</td>
                         </tr>
                         <tr>
                             <td>data.status</td>
                             <td>Integer</td>
                             <td>订单状态</td>
-                            <td>3</td>
+                            <td>2</td>
                         </tr>
                         <tr>
                             <td>data.create_time</td>
@@ -1938,16 +2086,16 @@ Content-Type: application/json
                 <div class="code-block">
                     <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                     <code>{
-    "code": 0,
+    "code": 1,
     "msg": "success",
     "data": {
-        "order_no": "SYS20240101002",
-        "merchant_order_no": "TRANSFER20240101001",
-        "amount": "100.00",
-        "status": 2,
-        "create_time": 1640995200,
-        "success_time": 1640995260
-    }
+         "order_no": "SYS20240101001",
+         "merchant_order_no": "ORDER20240101001",
+         "amount": "100.00",
+         "status": 3,
+         "create_time": 1640995200,
+         "success_time": 1640995260
+   }
 }</code>
                 </div>
             </div>
@@ -2034,8 +2182,8 @@ Content-Type: application/json
                         <tr>
                             <td>code</td>
                             <td>Integer</td>
-                            <td>状态码，0表示成功</td>
-                            <td>0</td>
+                            <td>状态码，1表示成功</td>
+                            <td>1</td>
                         </tr>
                         <tr>
                             <td>msg</td>
@@ -2062,7 +2210,7 @@ Content-Type: application/json
                 <div class="code-block">
                     <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                     <code>{
-    "code": 0,
+    "code": 1,
     "msg": "success",
     "data": {
         "balance": "9999.99",
@@ -2157,7 +2305,33 @@ Content-Type: application/json
                         </tr>
                     </tbody>
                 </table>
-
+                <h3><i class="fas fa-info-circle"></i> 收订单状态说明</h3>
+                <table class="param-table">
+                    <thead>
+                    <tr>
+                        <th>状态值</th>
+                        <th>状态名称</th>
+                        <th>说明</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><code>2</code></td>
+                        <td>成功</td>
+                        <td>支付成功，资金已到账</td>
+                    </tr>
+                    <tr>
+                        <td><code>-1</code></td>
+                        <td>失败</td>
+                        <td>代付失败</td>
+                    </tr>
+                    <tr>
+                        <td><code>-2</code></td>
+                        <td>已取消</td>
+                        <td>订单已取消</td>
+                    </tr>
+                    </tbody>
+                </table>
                 <h3><i class="fas fa-code"></i> 通知示例</h3>
                 <div class="code-block">
                     <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
@@ -2253,27 +2427,39 @@ function verifySign($params, $secret) {
                         </tr>
                         <tr>
                             <td>amount</td>
-                            <td>String</td>
-                            <td>订单金额</td>
+                            <td>Decimal</td>
+                            <td>代付金额</td>
                             <td>100</td>
                         </tr>
                         <tr>
+                            <td>fee</td>
+                            <td>Decimal</td>
+                            <td>手续费</td>
+                            <td>0.2</td>
+                        </tr>
+                        <tr>
                             <td>real_amount</td>
-                            <td>String</td>
-                            <td>实际到账金额</td>
-                            <td>99.7</td>
+                            <td>Decimal</td>
+                            <td>实际到账金额（amount - fee）</td>
+                            <td>99.8</td>
                         </tr>
                         <tr>
                             <td>status</td>
+                            <td>Integer</td>
+                            <td>订单状态：1=成功，-1=失败</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>status_text</td>
                             <td>String</td>
-                            <td>订单状态 成功=3，失败=-1</td>
-                            <td>3</td>
+                            <td>状态描述</td>
+                            <td>代付成功</td>
                         </tr>
                         <tr>
                             <td>pay_time</td>
-                            <td>String</td>
-                            <td>支付完成时间</td>
-                            <td>1755225829</td>
+                            <td>Integer</td>
+                            <td>代付完成时间戳</td>
+                            <td>1759089980</td>
                         </tr>
                         <tr>
                             <td>timestamp</td>
@@ -2289,7 +2475,33 @@ function verifySign($params, $secret) {
                         </tr>
                     </tbody>
                 </table>
-
+                <h3><i class="fas fa-info-circle"></i> 代付订单状态说明</h3>
+                <table class="param-table">
+                    <thead>
+                    <tr>
+                        <th>状态值</th>
+                        <th>状态名称</th>
+                        <th>说明</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><code>3</code></td>
+                        <td>成功</td>
+                        <td>代付已成功完成</td>
+                    </tr>
+                    <tr>
+                        <td><code>-1</code></td>
+                        <td>失败</td>
+                        <td>代付失败</td>
+                    </tr>
+                    <tr>
+                        <td><code>-2</code></td>
+                        <td>已取消</td>
+                        <td>代付订单已取消</td>
+                    </tr>
+                    </tbody>
+                </table>
                 <h3><i class="fas fa-code"></i> 通知示例</h3>
                 <div class="code-block">
                     <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
@@ -2298,14 +2510,16 @@ Host: your-site.com
 Content-Type: application/json
 
 {
-    "merchant_id": "M2501082278",
-    "order_no": "W202508150547031407128ce",
-    "merchant_order_no": "TEST1755208021953",
-    "amount": "100",
-    "real_amount": "99.7",
-    "status": "3",
-    "pay_time": "1755225829",
-    "timestamp": "1755225829",
+    "merchant_id": "10001",
+    "order_no": "W202509290406012179bfc99",
+    "merchant_order_no": "TEST1759089961685",
+    "amount": 100,
+    "fee": 0.2,
+    "real_amount": 99.8,
+    "status": 1,
+    "status_text": "代付成功",
+    "pay_time": 1759089980,
+    "timestamp": 1759089980,
     "sign": "A40F6622E8391B34E63E7962FD465315"
 }</code>
                 </div>
@@ -2422,8 +2636,8 @@ Content-Type: application/json
                         <tr>
                             <td>code</td>
                             <td>Integer</td>
-                            <td>状态码，0表示成功</td>
-                            <td>0</td>
+                            <td>状态码，1表示成功</td>
+                            <td>1</td>
                         </tr>
                         <tr>
                             <td>msg</td>
@@ -2456,7 +2670,7 @@ Content-Type: application/json
                 <div class="code-block">
                     <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                     <code>{
-    "code": 0,
+    "code": 1,
     "msg": "success",
     "data": {
         "receipt_url": "https://api.yourpay.com/receipt/download/abc123def456",
@@ -2538,18 +2752,35 @@ class PaymentAPI {
         $this->apiUrl = $apiUrl;
     }
 
-    // 生成签名
+    // 生成签名（支持数组参数）
     private function generateSign($params) {
+        // 移除sign字段
         unset($params['sign']);
-        ksort($params);
 
-        $string = '';
+        // 处理数组参数
         foreach ($params as $key => $value) {
-            $string .= $key . '=' . $value . '&';
+            if (is_array($value)) {
+                ksort($value);
+                $arr = [];
+                foreach ($value as $ak => $av) {
+                    if ($av !== '' && $av !== null) $arr[] = "$ak=$av";
+                }
+                $params[$key] = implode('&', $arr);
+            }
         }
-        $string .= 'key=' . $this->secretKey;
 
-        return strtoupper(md5($string));
+        // 排序并过滤空值
+        ksort($params);
+        $params = array_filter($params, function($v) {
+            return $v !== '' && $v !== null;
+        });
+
+        // 构建签名字符串
+        $pairs = [];
+        foreach ($params as $k => $v) $pairs[] = "$k=$v";
+        $signStr = implode('&', $pairs) . "&key=" . $this->secretKey;
+
+        return strtoupper(md5($signStr));
     }
 
     // 代收下单
@@ -2580,14 +2811,16 @@ class PaymentAPI {
             'merchant_order_no' => $merchantOrderNo,
             'notify_url' => $notifyUrl,
             'subject' => $subject,
-            'extra_params' => $extraParams,
-            'timestamp' => time()
+            'extra_params' => $extraParams,  // 数组参数，会被自动处理
+            'timestamp' => time(),
+            'sign_type' => 'md5'  // 签名类型
         ];
 
         $params['sign'] = $this->generateSign($params);
 
         return $this->httpPost('/repay/unifiedOrder', $params);
     }
+
 
     // HTTP请求
     private function httpPost($uri, $data) {
@@ -2629,11 +2862,28 @@ $transferResult = $api->createTransferOrder(
     'TRANSFER' . time(),       // 商户订单号
     'https://your-site.com/transfer-notify', // 通知地址
     '佣金发放',                 // 说明
-    [                          // 收款人信息
+    [                          // 收款人信息（数组参数）
         'name' => 'João Silva',
-        'CPF' => '12345678901'
+        'CPF' => '12345678901',
+        'phone' => '+5511999999999',
+        'email' => 'joao@example.com'
     ]
 );
+
+// 代付签名处理说明：
+// extra_params 数组会被处理为：
+// "CPF=12345678901&email=joao@example.com&name=João Silva&phone=+5511999999999"
+
+// 回调验证示例
+function verifyNotifySign($notifyData, $secretKey) {
+    $receivedSign = $notifyData['sign'] ?? '';
+
+    // 使用标准签名方法验证
+    $api = new PaymentAPI('', $secretKey, '');
+    $calculatedSign = $api->generateSign($notifyData);
+
+    return $receivedSign === $calculatedSign;
+}
 ?&gt;
                             </code>
                         </div>
@@ -2663,24 +2913,46 @@ public class PaymentAPI {
         this.objectMapper = new ObjectMapper();
     }
 
-    // 生成签名
+    // 生成签名（支持数组参数）
     private String generateSign(Map<String, Object> params) throws Exception {
         Map<String, Object> signParams = new HashMap<>(params);
         signParams.remove("sign");
-        signParams.remove("sign_type");
 
-        List<String> keys = new ArrayList<>(signParams.keySet());
+        // 处理数组参数
+        for (Map.Entry<String, Object> entry : signParams.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> mapValue = (Map<String, Object>) value;
+                List<String> mapKeys = new ArrayList<>(mapValue.keySet());
+                Collections.sort(mapKeys);
+
+                StringBuilder arrayStr = new StringBuilder();
+                for (String mapKey : mapKeys) {
+                    Object mapVal = mapValue.get(mapKey);
+                    if (mapVal != null && !mapVal.toString().isEmpty()) {
+                        if (arrayStr.length() > 0) arrayStr.append("&");
+                        arrayStr.append(mapKey).append("=").append(mapVal);
+                    }
+                }
+                signParams.put(entry.getKey(), arrayStr.toString());
+            }
+        }
+
+        // 排序并过滤空值
+        List<String> keys = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : signParams.entrySet()) {
+            Object value = entry.getValue();
+            if (value != null && !value.toString().isEmpty()) {
+                keys.add(entry.getKey());
+            }
+        }
         Collections.sort(keys);
 
         StringBuilder signStr = new StringBuilder();
         for (String key : keys) {
             Object value = signParams.get(key);
-            if (value != null && !value.toString().isEmpty()) {
-                if (value instanceof Map || value instanceof List) {
-                    value = objectMapper.writeValueAsString(value);
-                }
-                signStr.append(key).append("=").append(value).append("&");
-            }
+            signStr.append(key).append("=").append(value).append("&");
         }
         signStr.append("key=").append(secretKey);
 
@@ -2793,6 +3065,8 @@ public class PaymentAPI {
             Map<String, String> extraParams = new HashMap<>();
             extraParams.put("name", "João Silva");
             extraParams.put("CPF", "12345678901");
+            extraParams.put("phone", "+5511999999999");
+            extraParams.put("email", "joao@example.com");
 
             Map<String, Object> transferResult = api.createTransferOrder(
                 50.00,                            // 金额
@@ -2800,7 +3074,7 @@ public class PaymentAPI {
                 "TRANSFER" + System.currentTimeMillis(), // 商户订单号
                 "https://your-site.com/transfer-notify", // 通知地址
                 "佣金发放",                        // 说明
-                extraParams                       // 收款人信息
+                extraParams                       // 收款人信息（无pix相关字段）
             );
             System.out.println("代付订单创建结果: " + transferResult);
 
@@ -2827,15 +3101,42 @@ class PaymentAPI {
         this.apiUrl = apiUrl;
     }
 
-    // 生成签名
+    // 生成签名（支持数组参数）
     generateSign(params) {
         delete params.sign;
 
-        const sortedKeys = Object.keys(params).sort();
+        // 处理数组参数
+        for (const key in params) {
+            if (typeof params[key] === 'object' && params[key] !== null && !Array.isArray(params[key])) {
+                const obj = params[key];
+                const sortedKeys = Object.keys(obj).sort();
+                const pairs = [];
+
+                sortedKeys.forEach(k => {
+                    const v = obj[k];
+                    if (v !== '' && v !== null && v !== undefined) {
+                        pairs.push(`${k}=${v}`);
+                    }
+                });
+
+                params[key] = pairs.join('&');
+            }
+        }
+
+        // 排序并过滤空值
+        const filteredParams = {};
+        Object.keys(params).forEach(key => {
+            const value = params[key];
+            if (value !== '' && value !== null && value !== undefined) {
+                filteredParams[key] = value;
+            }
+        });
+
+        const sortedKeys = Object.keys(filteredParams).sort();
         let string = '';
 
         sortedKeys.forEach(key => {
-            string += `${key}=${params[key]}&`;
+            string += `${key}=${filteredParams[key]}&`;
         });
         string += `key=${this.secretKey}`;
 
@@ -2852,7 +3153,8 @@ class PaymentAPI {
             merchant_order_no: merchantOrderNo,
             notify_url: notifyUrl,
             subject: subject,
-            timestamp: Math.floor(Date.now() / 1000)
+            timestamp: Math.floor(Date.now() / 1000),
+            sign_type: 'md5'
         };
 
         params.sign = this.generateSign({...params});
@@ -2871,12 +3173,44 @@ class PaymentAPI {
         }
     }
 
+    // 代付下单
+    async createTransferOrder(amount, channelCode, merchantOrderNo, notifyUrl, subject, extraParams) {
+        const params = {
+            merchant_id: this.merchantId,
+            amount: amount.toFixed(2),
+            currency: 'BRL',
+            channel_code: channelCode,
+            merchant_order_no: merchantOrderNo,
+            notify_url: notifyUrl,
+            subject: subject,
+            extra_params: extraParams,
+            timestamp: Math.floor(Date.now() / 1000),
+            sign_type: 'md5'
+        };
+
+        params.sign = this.generateSign({...params});
+
+        try {
+            const response = await axios.post(`${this.apiUrl}/repay/unifiedOrder`, params, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                timeout: 30000
+            });
+
+            return response.data;
+        } catch (error) {
+            throw new Error(`API请求失败: ${error.message}`);
+        }
+    }
+
     // 查询订单
     async queryOrder(merchantOrderNo) {
         const params = {
             merchant_id: this.merchantId,
             merchant_order_no: merchantOrderNo,
-            timestamp: Math.floor(Date.now() / 1000)
+            timestamp: Math.floor(Date.now() / 1000),
+            sign_type: 'md5'
         };
 
         params.sign = this.generateSign({...params});
@@ -2899,7 +3233,7 @@ class PaymentAPI {
 // 使用示例
 const api = new PaymentAPI('10001', 'your_secret_key', 'https://api.yourpay.com');
 
-// 创建订单
+// 创建代收订单
 api.createPayOrder(
     100.00,
     'pix_001',
@@ -2907,9 +3241,30 @@ api.createPayOrder(
     'https://your-site.com/notify',
     '商品购买'
 ).then(result => {
-    console.log('订单创建成功:', result);
+    console.log('代收订单创建成功:', result);
 }).catch(error => {
-    console.error('订单创建失败:', error);
+    console.error('代收订单创建失败:', error);
+});
+
+// 创建代付订单
+const extraParams = {
+    name: 'João Silva',
+    CPF: '12345678901',
+    phone: '+5511999999999',
+    email: 'joao@example.com'
+};
+
+api.createTransferOrder(
+    50.00,
+    'pix_transfer',
+    `TRANSFER${Date.now()}`,
+    'https://your-site.com/transfer-notify',
+    '佣金发放',
+    extraParams
+).then(result => {
+    console.log('代付订单创建成功:', result);
+}).catch(error => {
+    console.error('代付订单创建失败:', error);
 });
                             </code>
                         </div>
@@ -2932,14 +3287,26 @@ api.createPayOrder(
                             <div class="code-block">
                                 <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                                 <code>
-1. 将所有请求参数（除sign外）按参数名ASCII码升序排序
-2. 将排序后的参数按 key=value&key=value 格式拼接
-3. 在拼接字符串末尾加上 &key=商户密钥
-4. 对拼接后的字符串进行MD5加密，转为大写
+1. 移除 sign 字段（如果存在）
+2. 处理数组参数：将数组转换为 key=value&key=value 格式
+3. 将所有参数（除空值外）按参数名ASCII码升序排序
+4. 将排序后的参数按 key=value&key=value 格式拼接
+5. 在拼接字符串末尾加上 &key=商户密钥
+6. 对拼接后的字符串进行MD5加密，转为大写
                                 </code>
                             </div>
 
-                            <h3><i class="fas fa-code"></i> 签名示例</h3>
+                            <div class="alert alert-info">
+                                <strong><i class="fas fa-info-circle"></i> 重要说明：</strong>
+                                <ul style="margin: 10px 0; padding-left: 20px;">
+                                    <li><strong>数组参数处理：</strong>如 extra_params 等数组字段，需转换为 "key1=value1&key2=value2" 格式</li>
+                                    <li><strong>sign_type参数：</strong>必须包含，用于指定签名算法类型（如md5）</li>
+                                    <li><strong>空值过滤：</strong>空字符串和null值不参与签名</li>
+                                    <li><strong>签名类型：</strong>支持MD5（默认）、SHA256、HMAC等多种签名算法</li>
+                                </ul>
+                            </div>
+
+                            <h3><i class="fas fa-code"></i> 基本签名示例</h3>
                             <div class="code-block">
                                 <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                                 <code>
@@ -2948,14 +3315,135 @@ api.createPayOrder(
   "merchant_id": "10001",
   "amount": "100.00",
   "currency": "BRL",
-  "timestamp": "1640995200"
+  "timestamp": "1640995200",
+  "sign_type": "md5"
 }
 
 // 排序后拼接
-amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&key=YOUR_SECRET_KEY
+amount=100.00&currency=BRL&merchant_id=10001&sign_type=md5&timestamp=1640995200&key=YOUR_SECRET_KEY
 
 // MD5加密后
-sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&key=YOUR_SECRET_KEY").toUpperCase()
+sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&sign_type=md5&timestamp=1640995200&key=YOUR_SECRET_KEY").toUpperCase()
+// 结果: 3CB67414A73ADAF9D4029EDD5FF9771E
+                                </code>
+                            </div>
+
+                            <h3><i class="fas fa-code"></i> 代付数组参数签名示例</h3>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
+                                <code>
+// 代付请求原始参数
+{
+  "merchant_id": "10001",
+  "amount": "100.00",
+  "currency": "BRL",
+  "extra_params": {
+    "name": "João Silva",
+    "CPF": "12345678901",
+    "phone": "+5511999999999"
+  },
+  "timestamp": "1640995200",
+  "sign_type": "md5"
+}
+
+// 处理步骤：
+// 1. 移除sign字段（如果存在）
+// 2. 处理数组参数：extra_params 转换为字符串
+//    extra_params = "CPF=12345678901&name=João Silva&phone=+5511999999999"
+// 3. 排序并拼接
+amount=100.00&currency=BRL&extra_params=CPF=12345678901&name=João Silva&phone=+5511999999999&merchant_id=10001&sign_type=md5&timestamp=1640995200&key=YOUR_SECRET_KEY
+
+// 4. MD5加密并转大写
+sign = MD5(上述字符串).toUpperCase()
+                                </code>
+                            </div>
+
+                            <h3><i class="fas fa-info-circle"></i> 完整签名示例</h3>
+                            <div class="alert alert-success">
+                                <strong>标准流程：</strong>所有商户请求都按照统一的签名流程处理，无特殊排除字段。
+                            </div>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
+                                <code>
+// 完整的代付请求参数
+{
+  "merchant_id": "10001",
+  "amount": "100.00",
+  "currency": "BRL",
+  "extra_params": {
+    "name": "João Silva",
+    "CPF": "12345678901",
+    "phone": "+5511999999999",
+    "email": "joao@example.com"
+  },
+  "timestamp": "1640995200",
+  "sign_type": "md5"
+}
+
+// 标准签名字符串：
+amount=100.00&currency=BRL&extra_params=CPF=12345678901&email=joao@example.com&name=João Silva&phone=+5511999999999&merchant_id=10001&sign_type=md5&timestamp=1640995200&key=YOUR_SECRET_KEY
+                                </code>
+                            </div>
+
+                            <h3><i class="fas fa-tools"></i> 推荐签名方法</h3>
+                            <div class="alert alert-success">
+                                <strong><i class="fas fa-thumbs-up"></i> 推荐使用：</strong>
+                                以下是经过优化的简洁签名方法，可直接使用。
+                            </div>
+
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
+                                <code>
+/**
+ * 签名方法（推荐版本）
+ */
+function merchantSign($data, $key) {
+    // 移除sign字段
+    unset($data['sign']);
+
+    // 处理数组参数
+    foreach ($data as $k => $v) {
+        if (is_array($v)) {
+            ksort($v);
+            $arr = [];
+            foreach ($v as $ak => $av) {
+                if ($av !== '' && $av !== null) $arr[] = "$ak=$av";
+            }
+            $data[$k] = implode('&', $arr);
+        }
+    }
+
+    // 排序并过滤空值
+    ksort($data);
+    $data = array_filter($data, function($v) {
+        return $v !== '' && $v !== null;
+    });
+
+    // 构建签名字符串
+    $pairs = [];
+    foreach ($data as $k => $v) $pairs[] = "$k=$v";
+    $signStr = implode('&', $pairs) . "&key=$key";
+
+    return strtoupper(md5($signStr));
+}
+
+// 使用示例
+$params = [
+    'merchant_id' => 'your_merchant_id',
+    'amount' => '100.00',
+    'extra_params' => [
+        'name' => 'João Silva',
+        'CPF' => '12345678901'
+    ],
+    'timestamp' => time(),
+    'sign_type' => 'md5'
+];
+
+$sign = merchantSign($params, 'your_secret_key');
+$params['sign'] = $sign;
+
+// 回调验证
+$isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                                 </code>
                             </div>
 
@@ -2966,6 +3454,112 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
                                 <li>请求时间与服务器时间差不超过5分钟</li>
                                 <li>建议每次请求使用当前时间戳</li>
                             </ul>
+                        </div>
+                    </div>
+
+                    <div id="currency" class="content-section">
+                        <div class="section">
+                            <h2><i class="fas fa-coins"></i> 货币代码</h2>
+
+                            <div class="alert alert-info">
+                                <strong>说明：</strong> 以下是系统支持的货币代码列表，请在接口调用时使用对应的货币代码。
+                            </div>
+
+                            <h3><i class="fas fa-globe"></i> 支持的货币</h3>
+
+                            <table class="param-table">
+                                <thead>
+                                    <tr>
+                                        <th>货币代码</th>
+                                        <th>货币名称</th>
+                                        <th>货币符号</th>
+                                        <th>说明</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>BRL</code></td>
+                                        <td>巴西雷亚尔</td>
+                                        <td>R$</td>
+                                        <td>巴西官方货币</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>USD</code></td>
+                                        <td>美元</td>
+                                        <td>$</td>
+                                        <td>美国官方货币</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>EUR</code></td>
+                                        <td>欧元</td>
+                                        <td>€</td>
+                                        <td>欧盟官方货币</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>CNY</code></td>
+                                        <td>人民币</td>
+                                        <td>¥</td>
+                                        <td>中国官方货币</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>ARS</code></td>
+                                        <td>阿根廷比索</td>
+                                        <td>$</td>
+                                        <td>阿根廷官方货币</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>MXN</code></td>
+                                        <td>墨西哥比索</td>
+                                        <td>$</td>
+                                        <td>墨西哥官方货币</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>COP</code></td>
+                                        <td>哥伦比亚比索</td>
+                                        <td>$</td>
+                                        <td>哥伦比亚官方货币</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>PEN</code></td>
+                                        <td>秘鲁索尔</td>
+                                        <td>S/</td>
+                                        <td>秘鲁官方货币</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>CLP</code></td>
+                                        <td>智利比索</td>
+                                        <td>$</td>
+                                        <td>智利官方货币</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>UYU</code></td>
+                                        <td>乌拉圭比索</td>
+                                        <td>$U</td>
+                                        <td>乌拉圭官方货币</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+                            <ul style="margin: 20px 0; padding-left: 30px;">
+                                <li>所有金额字段都需要指定对应的货币代码</li>
+                                <li>货币代码必须使用大写字母，如：BRL、USD、EUR</li>
+                                <li>不同货币的最小金额限制可能不同，请咨询技术支持</li>
+                                <li>汇率转换由系统自动处理，无需手动计算</li>
+                            </ul>
+
+                            <h3><i class="fas fa-code"></i> 使用示例</h3>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
+                                <code>
+{
+  "merchant_id": "10001",
+  "amount": "100.00",
+  "currency": "BRL",  // 巴西雷亚尔
+  "order_id": "ORDER_20240101_001"
+}
+                                </code>
+                            </div>
                         </div>
                     </div>
 
@@ -3015,6 +3609,7 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
             const titles = {
                 'overview': '接口概述',
                 'auth': '接口认证',
+                'currency': '货币代码',
                 'collection': '代收接口',
                 'transfer': '代付接口',
                 'order-query': '订单查询',
@@ -3592,6 +4187,7 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
         const ACCESS_PASSWORD_HASH = 'a01735ecf31013e03174f7e8c7e530fdd3895576a3fab22822f1496d1948ca13';
         const SESSION_KEY = 'api_doc_authenticated';
 
+
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -3600,16 +4196,15 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
             return hashHex;
         }
 
-        // 页面加载时检查认证状态
+
         window.addEventListener('load', function() {
-            // 检查会话存储中是否已认证
+
             if (sessionStorage.getItem(SESSION_KEY) === 'true') {
                 hideAuthOverlay();
             } else {
                 showAuthOverlay();
             }
 
-            // 为密码输入框添加回车键监听
             document.getElementById('passwordInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     checkPassword();
@@ -3631,13 +4226,16 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
             const errorElement = document.getElementById('authError');
 
             try {
+
                 const inputHash = await sha256(inputPassword);
 
                 if (inputHash === ACCESS_PASSWORD_HASH) {
+
                     sessionStorage.setItem(SESSION_KEY, 'true');
                     hideAuthOverlay();
                     errorElement.style.display = 'none';
                 } else {
+
                     showPasswordError(errorElement);
                 }
             } catch (error) {
@@ -3651,18 +4249,16 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&timestamp=1640995200&ke
             document.getElementById('passwordInput').value = '';
             document.getElementById('passwordInput').focus();
 
-            // 3秒后隐藏错误信息
+
             setTimeout(() => {
                 errorElement.style.display = 'none';
             }, 3000);
         }
 
-        // 可选：添加退出登录功能（清除认证状态）
         function logout() {
             sessionStorage.removeItem(SESSION_KEY);
             showAuthOverlay();
         }
-
     </script>
 </body>
 </html>
