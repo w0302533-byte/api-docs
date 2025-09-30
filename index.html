@@ -2432,12 +2432,6 @@ function verifySign($params, $secret) {
                             <td>100</td>
                         </tr>
                         <tr>
-                            <td>fee</td>
-                            <td>Decimal</td>
-                            <td>手续费</td>
-                            <td>0.2</td>
-                        </tr>
-                        <tr>
                             <td>real_amount</td>
                             <td>Decimal</td>
                             <td>实际到账金额（amount - fee）</td>
@@ -2448,12 +2442,6 @@ function verifySign($params, $secret) {
                             <td>Integer</td>
                             <td>订单状态：1=成功，-1=失败</td>
                             <td>1</td>
-                        </tr>
-                        <tr>
-                            <td>status_text</td>
-                            <td>String</td>
-                            <td>状态描述</td>
-                            <td>代付成功</td>
                         </tr>
                         <tr>
                             <td>pay_time</td>
@@ -2514,10 +2502,8 @@ Content-Type: application/json
     "order_no": "W202509290406012179bfc99",
     "merchant_order_no": "TEST1759089961685",
     "amount": 100,
-    "fee": 0.2,
     "real_amount": 99.8,
     "status": 1,
-    "status_text": "代付成功",
     "pay_time": 1759089980,
     "timestamp": 1759089980,
     "sign": "A40F6622E8391B34E63E7962FD465315"
@@ -4184,9 +4170,8 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
             });
         });
 
-        const ACCESS_PASSWORD_HASH = 'a01735ecf31013e03174f7e8c7e530fdd3895576a3fab22822f1496d1948ca13';
+        const ACCESS_PASSWORD_HASH = 'a01735ecf31013e03174f7e8c7e530fdd3895576a3fab22822f1496d1948ca13'; 
         const SESSION_KEY = 'api_doc_authenticated';
-
 
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
@@ -4196,9 +4181,8 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
             return hashHex;
         }
 
-
         window.addEventListener('load', function() {
-
+            // 检查会话存储中是否已认证
             if (sessionStorage.getItem(SESSION_KEY) === 'true') {
                 hideAuthOverlay();
             } else {
@@ -4226,16 +4210,13 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
             const errorElement = document.getElementById('authError');
 
             try {
-
                 const inputHash = await sha256(inputPassword);
 
                 if (inputHash === ACCESS_PASSWORD_HASH) {
-
                     sessionStorage.setItem(SESSION_KEY, 'true');
                     hideAuthOverlay();
                     errorElement.style.display = 'none';
                 } else {
-
                     showPasswordError(errorElement);
                 }
             } catch (error) {
@@ -4248,7 +4229,6 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
             errorElement.style.display = 'block';
             document.getElementById('passwordInput').value = '';
             document.getElementById('passwordInput').focus();
-
 
             setTimeout(() => {
                 errorElement.style.display = 'none';
