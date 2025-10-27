@@ -4533,7 +4533,6 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
             return hashHex;
         }
 
-        // 页面加载时检查认证状态
         window.addEventListener('load', function() {
 
             if (sessionStorage.getItem(SESSION_KEY) === 'true') {
