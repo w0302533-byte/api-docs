@@ -1315,7 +1315,7 @@ https://sandbox-api.paymentgateway.com
                             <td>String</td>
                             <td><span class="required">是</span></td>
                             <td>支付通道编码</td>
-                            <td>bax</td>
+                            <td>请参阅后台支付通道里的编码</td>
                         </tr>
                         <tr>
                             <td>notify_url</td>
@@ -1573,7 +1573,7 @@ Content-Type: application/json
                             <td>String</td>
                             <td><span class="required">是</span></td>
                             <td>代付通道编码</td>
-                            <td>pix_transfer</td>
+                            <td>请参阅后台的代付通道的编码</td>
                         </tr>
                         <tr>
                             <td>merchant_order_no</td>
@@ -4478,7 +4478,7 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                 setupScrollSpy();
 
                 console.log('4. Fixing indentation...');
-                fixIndentation(); // 修复缩进问题
+                fixIndentation();
 
                 console.log('5. Debug page structure...');
                 debugPageStructure();
@@ -4521,10 +4521,10 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                 });
             });
         });
-        
+
         const ACCESS_PASSWORD_HASH = 'a01735ecf31013e03174f7e8c7e530fdd3895576a3fab22822f1496d1948ca13';
         const SESSION_KEY = 'api_doc_authenticated';
-        
+
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -4533,6 +4533,7 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
             return hashHex;
         }
 
+        // 页面加载时检查认证状态
         window.addEventListener('load', function() {
 
             if (sessionStorage.getItem(SESSION_KEY) === 'true') {
@@ -4586,7 +4587,7 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                 errorElement.style.display = 'none';
             }, 3000);
         }
-        
+
         function logout() {
             sessionStorage.removeItem(SESSION_KEY);
             showAuthOverlay();
