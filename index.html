@@ -1663,7 +1663,15 @@ Content-Type: application/json
     "name": "Aibek Asanov",
     "bankaccount": "12345678901",
     "bankname": "Optima Bank"
-}</code>
+}
+
+// 墨西哥
+{
+    "name": "Aibek Asanov",
+    "bankaccount": "12345678901",
+    "bankname": "Optima Bank"
+}                                    
+                                </code>
                             </div>
                         </div>
                     </div>
@@ -3832,6 +3840,55 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                                 </div>
                             </div>
 
+                            <!-- 墨西哥 - 可折叠 -->
+                            <div id="kyrgyzstan-params" class="collapsible-section">
+                                <div class="collapsible-header" onclick="toggleCollapsible('kyrgyzstan-params')">
+                                    <h4>
+                                        <i class="fas fa-flag"></i>
+                                        墨西哥 - 银行转账
+                                    </h4>
+                                    <i class="fas fa-chevron-down collapsible-icon"></i>
+                                </div>
+                                <div class="collapsible-content">
+                                    <div class="collapsible-body">
+                                        <table class="param-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>参数名</th>
+                                                    <th>类型</th>
+                                                    <th>必填</th>
+                                                    <th>说明</th>
+                                                    <th>示例值</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><code>bankaccount</code></td>
+                                                    <td>String</td>
+                                                    <td><span class="required">是</span></td>
+                                                    <td>收款账号</td>
+                                                    <td>12345678901</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><code>bankname</code></td>
+                                                    <td>String</td>
+                                                    <td><span class="required">是</span></td>
+                                                    <td>收款姓名</td>
+                                                    <td>Optima Bank</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><code>banks</code></td>
+                                                    <td>String</td>
+                                                    <td><span class="optional">否</span></td>
+                                                    <td>银行名称（可选）</td>
+                                                    <td>OPTIMA</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- 预留：其他国家 -->
                             <div style="background: #f8f9fa; border: 2px dashed #dee2e6; padding: 20px; border-radius: 8px; margin: 20px 0;">
                                 <h4 style="color: #6c757d; margin: 0 0 10px 0;">
@@ -3858,6 +3915,14 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
 }
 
 // 吉尔吉斯斯坦 - 银行转账
+{
+    "name": "Aibek Asanov",
+    "bankaccount": "12345678901",
+    "bankname": "Optima Bank",
+    "banks": "OPTIMA"
+}
+
+// 墨西哥 - 银行转账
 {
     "name": "Aibek Asanov",
     "bankaccount": "12345678901",
