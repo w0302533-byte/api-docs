@@ -1308,7 +1308,9 @@ https://sandbox-api.paymentgateway.com
                             <td>String</td>
                             <td><span class="required">是</span></td>
                             <td>货币类型</td>
-                            <td>BRL</td>
+                            <td>请参阅<a href="javascript:void(0)" onclick="showSection('currency')" style="color: #0969da; text-decoration: underline;">
+                                    <strong>货币代码</strong>
+                                </a></td>
                         </tr>
                         <tr>
                             <td>channel_code</td>
@@ -1565,10 +1567,10 @@ Content-Type: application/json
                             <td>currency</td>
                             <td>String</td>
                             <td><span class="required">是</span></td>
-                            <td>货币类型<a href="javascript:void(0)" onclick="showSection('currency')" style="color: #0969da; text-decoration: underline;">
+                            <td>货币类型</td>
+                            <td>请参阅<a href="javascript:void(0)" onclick="showSection('currency')" style="color: #0969da; text-decoration: underline;">
                                     <strong>货币代码</strong>
                                 </a></td>
-                            <td>BRL</td>
                         </tr>
                         <tr>
                             <td>channel_code</td>
@@ -1703,9 +1705,7 @@ Content-Type: application/json
     "subject": "佣金发放",
     "extra_params": {
         "name": "João Silva",
-        "CPF": "12345678901",
-        "phone": "+5511999999999",
-        "email": "joao@example.com"
+        "CPF": "12345678901"
     },
     "timestamp": 1640995200,
     "sign_type": "md5",
