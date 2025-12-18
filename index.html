@@ -2980,15 +2980,13 @@ $transferResult = $api->createTransferOrder(
     '佣金发放',                 // 说明
     [                          // 收款人信息（数组参数）
         'name' => 'João Silva',
-        'CPF' => '12345678901',
-        'phone' => '+5511999999999',
-        'email' => 'joao@example.com'
+        'CPF' => '12345678901'
     ]
 );
 
 // 代付签名处理说明：
 // extra_params 数组会被处理为：
-// "CPF=12345678901&email=joao@example.com&name=João Silva&phone=+5511999999999"
+// "CPF=12345678901&name=João Silva"
 
 // 回调验证示例
 function verifyNotifySign($notifyData, $secretKey) {
@@ -3181,8 +3179,6 @@ public class PaymentAPI {
             Map<String, String> extraParams = new HashMap<>();
             extraParams.put("name", "João Silva");
             extraParams.put("CPF", "12345678901");
-            extraParams.put("phone", "+5511999999999");
-            extraParams.put("email", "joao@example.com");
 
             Map<String, Object> transferResult = api.createTransferOrder(
                 50.00,                            // 金额
@@ -3365,9 +3361,7 @@ api.createPayOrder(
 // 创建代付订单
 const extraParams = {
     name: 'João Silva',
-    CPF: '12345678901',
-    phone: '+5511999999999',
-    email: 'joao@example.com'
+    CPF: '12345678901'
 };
 
 api.createTransferOrder(
@@ -3426,7 +3420,7 @@ api.createTransferOrder(
                             <div class="code-block">
                                 <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                                 <code>
-// 原始参数
+// 示例参数以文档字段为准
 {
   "merchant_id": "10001",
   "amount": "100.00",
@@ -3448,7 +3442,7 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&sign_type=md5&timestamp
                             <div class="code-block">
                                 <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                                 <code>
-// 代付请求原始参数
+// 代付请求示例参数以文档字段为准
 {
   "merchant_id": "10001",
   "amount": "100.00",
@@ -3456,7 +3450,6 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&sign_type=md5&timestamp
   "extra_params": {
     "name": "João Silva",
     "CPF": "12345678901",
-    "phone": "+5511999999999"
   },
   "timestamp": "1640995200",
   "sign_type": "md5"
@@ -3465,9 +3458,9 @@ sign = MD5("amount=100.00&currency=BRL&merchant_id=10001&sign_type=md5&timestamp
 // 处理步骤：
 // 1. 移除sign字段（如果存在）
 // 2. 处理数组参数：extra_params 转换为字符串
-//    extra_params = "CPF=12345678901&name=João Silva&phone=+5511999999999"
+//    extra_params = "CPF=12345678901&name=João Silva"
 // 3. 排序并拼接
-amount=100.00&currency=BRL&extra_params=CPF=12345678901&name=João Silva&phone=+5511999999999&merchant_id=10001&sign_type=md5&timestamp=1640995200&key=YOUR_SECRET_KEY
+amount=100.00&currency=BRL&extra_params=CPF=12345678901&name=João Silva&merchant_id=10001&sign_type=md5&timestamp=1640995200&key=YOUR_SECRET_KEY
 
 // 4. MD5加密并转大写
 sign = MD5(上述字符串).toUpperCase()
@@ -3481,23 +3474,21 @@ sign = MD5(上述字符串).toUpperCase()
                             <div class="code-block">
                                 <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
                                 <code>
-// 完整的代付请求参数
+// 示例代付参数以文档字段为准
 {
   "merchant_id": "10001",
   "amount": "100.00",
   "currency": "BRL",
   "extra_params": {
     "name": "João Silva",
-    "CPF": "12345678901",
-    "phone": "+5511999999999",
-    "email": "joao@example.com"
+    "CPF": "12345678901"
   },
   "timestamp": "1640995200",
   "sign_type": "md5"
 }
 
 // 标准签名字符串：
-amount=100.00&currency=BRL&extra_params=CPF=12345678901&email=joao@example.com&name=João Silva&phone=+5511999999999&merchant_id=10001&sign_type=md5&timestamp=1640995200&key=YOUR_SECRET_KEY
+amount=100.00&currency=BRL&extra_params=CPF=12345678901&name=João Silva&merchant_id=10001&sign_type=md5&timestamp=1640995200&key=YOUR_SECRET_KEY
                                 </code>
                             </div>
 
@@ -3837,7 +3828,7 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                                                 <tr>
                                                     <td><code>banks</code></td>
                                                     <td>String</td>
-                                                    <td><span class="optional">是</span></td>
+                                                    <td><span class="required">是</span></td>
                                                     <td>银行名称</td>
                                                     <td>OPTIMA</td>
                                                 </tr>
@@ -3886,7 +3877,7 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                                                 <tr>
                                                     <td><code>banks</code></td>
                                                     <td>String</td>
-                                                    <td><span class="optional">是</span></td>
+                                                    <td><span class="required">是</span></td>
                                                     <td>银行名称（可选）</td>
                                                     <td>OPTIMA</td>
                                                 </tr>
@@ -3935,7 +3926,7 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                                                 <tr>
                                                     <td><code>banks</code></td>
                                                     <td>String</td>
-                                                    <td><span class="optional">是</span></td>
+                                                    <td><span class="required">是</span></td>
                                                     <td>银行名称</td>
                                                     <td>Mercado pago</td>
                                                 </tr>
