@@ -1682,6 +1682,13 @@ Content-Type: application/json
     "bankname": "Paola Marina Castro",
     "banks": "Mercado pago"
 }
+
+// 多米尼加
+{
+    "bankaccount": "0000003100001234567890",
+    "bankname": "Paola Marina Castro",
+    "banks": "Mercado pago"
+}
                                 </code>
                             </div>
                         </div>
@@ -3623,6 +3630,12 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                                         <td>墨西哥官方货币</td>
                                     </tr>
                                     <tr>
+                                        <td><code>DOP</code></td>
+                                        <td>多米尼加比索</td>
+                                        <td>RD$</td>
+                                        <td>多米尼加官方货币</td>
+                                    </tr>
+                                    <tr>
                                         <td><code>COP</code></td>
                                         <td>哥伦比亚比索</td>
                                         <td>$</td>
@@ -3880,7 +3893,7 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                                                     <td><code>banks</code></td>
                                                     <td>String</td>
                                                     <td><span class="required">是</span></td>
-                                                    <td>银行名称（可选）</td>
+                                                    <td>银行名称</td>
                                                     <td>OPTIMA</td>
                                                 </tr>
                                             </tbody>
@@ -3938,6 +3951,55 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
                                 </div>
                             </div>
 
+                            <!-- 多米尼加 - 可折叠 -->
+                            <div id="dop-params" class="collapsible-section">
+                                <div class="collapsible-header" onclick="toggleCollapsible('dop-params')">
+                                    <h4>
+                                        <i class="fas fa-flag"></i>
+                                        多米尼加 (DOP) - 银行转账
+                                    </h4>
+                                    <i class="fas fa-chevron-down collapsible-icon"></i>
+                                </div>
+                                <div class="collapsible-content">
+                                    <div class="collapsible-body">
+                                        <table class="param-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>参数名</th>
+                                                    <th>类型</th>
+                                                    <th>必填</th>
+                                                    <th>说明</th>
+                                                    <th>示例值</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><code>bankaccount</code></td>
+                                                    <td>String</td>
+                                                    <td><span class="required">是</span></td>
+                                                    <td>收款账号</td>
+                                                    <td>12345678901</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><code>bankname</code></td>
+                                                    <td>String</td>
+                                                    <td><span class="required">是</span></td>
+                                                    <td>收款姓名</td>
+                                                    <td>Optima Bank</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><code>banks</code></td>
+                                                    <td>String</td>
+                                                    <td><span class="required">是</span></td>
+                                                    <td>银行名称</td>
+                                                    <td>OPTIMA</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- 预留：其他国家 -->
                             <div style="background: #f8f9fa; border: 2px dashed #dee2e6; padding: 20px; border-radius: 8px; margin: 20px 0;">
                                 <h4 style="color: #6c757d; margin: 0 0 10px 0;">
@@ -3982,6 +4044,13 @@ $isValid = (merchantSign($_POST, $secretKey) === $_POST['sign']);
     "bankaccount": "0000003100001234567890",
     "bankname": "Paola Marina Castro",
     "banks": "Mercado pago"
+}
+
+// 多米尼加 - 银行转账
+{
+    "bankaccount": "12345678901",
+    "bankname": "Optima Bank",
+    "banks": "OPTIMA"
 }
 
 // 包含可选业务字段
